@@ -13,6 +13,7 @@ class StateSummary:
     has_box: bool
     box_volume_nm3: float | None
     openmm_version: str | None
+    deep_check: str
     valid: bool
 
     def __str__(self) -> str:
@@ -27,6 +28,7 @@ class StateSummary:
         if self.box_volume_nm3 is not None:
             lines.append(f"box volume      {self.box_volume_nm3:.3f} nm^3")
         lines.append(f"openmm version  {self.openmm_version}")
+        lines.append(f"deep check      {self.deep_check}")
         return "\n".join(lines)
 
 
@@ -53,6 +55,15 @@ def inspect_state(path: Path) -> StateSummary:
     except (TypeError, ValueError):
         valid = False
 
+    deep_result = _deep_validate(path)
+    if deep_result is None:
+        deep_check = "skipped (openmm not installed)"
+    elif deep_result:
+        deep_check = "passed"
+    else:
+        deep_check = "failed"
+        valid = False
+
     return StateSummary(
         particles=particles,
         step_count=_int_attr(root, "stepCount"),
@@ -62,8 +73,21 @@ def inspect_state(path: Path) -> StateSummary:
         has_box=box is not None,
         box_volume_nm3=box_volume,
         openmm_version=root.get("openmmVersion"),
+        deep_check=deep_check,
         valid=valid,
     )
+
+
+def _deep_validate(path: Path) -> bool | None:
+    try:
+        import openmm
+    except ImportError:
+        return None
+    try:
+        openmm.XmlSerializer.deserialize(path.read_text())
+        return True
+    except (ValueError, openmm.OpenMMException):
+        return False
 
 
 def _int_attr(elem: ET.Element, name: str) -> int | None:
