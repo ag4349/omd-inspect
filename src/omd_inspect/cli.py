@@ -1,5 +1,7 @@
 import argparse
+import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 from omd_inspect.state import inspect_state
@@ -12,6 +14,7 @@ def build_parser() -> argparse.ArgumentParser:
         description="Summarize an OpenMM state file without loading it in Python.",
     )
     parser.add_argument("path", type=Path, help="OpenMM State .xml file")
+    parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     return parser
 
 
@@ -40,8 +43,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"omd-inspect: {exc}", file=sys.stderr)
         return 1
 
-    print(summary)
-    return 0
+    print(json.dumps(asdict(summary)) if args.json else summary)
+    return 0 if summary.valid else 1
 
 
 if __name__ == "__main__":
