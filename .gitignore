@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+build/
+dist/
+
+# Working plan doc for this project — intentionally never committed.
+IMPLEMENTATION_PLAN.md
