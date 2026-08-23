@@ -1,22 +1,21 @@
 [project]
 name = "omd-inspect"
 version = "0.1.0"
-description = "Inspect OpenMM checkpoint state files and trajectory segments from the command line"
+description = "Inspect OpenMM state files from the command line"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
-dependencies = [
-    "openmm",
-    "mdtraj",
-]
+dependencies = []
 
 [project.scripts]
 omd-inspect = "omd_inspect.cli:main"
 
 [project.optional-dependencies]
+verify = ["openmm"]
 dev = [
     "pytest",
     "ruff",
+    "openmm",
 ]
 
 [build-system]
