@@ -11,9 +11,14 @@ from omd_inspect.xmltypes import sniff_root_tag
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="omd-inspect",
-        description="Summarize an OpenMM state file without loading it in Python.",
+        description=(
+            "Summarize an OpenMM State file (from Simulation.saveState()) without "
+            "loading it in Python. Does not handle .chk checkpoints "
+            "(Context.createCheckpoint()) — those are a separate, binary, "
+            "non-portable format and out of scope for this tool."
+        ),
     )
-    parser.add_argument("path", type=Path, help="OpenMM State .xml file")
+    parser.add_argument("path", type=Path, help="OpenMM State .xml file (not a .chk checkpoint)")
     parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     return parser
 
