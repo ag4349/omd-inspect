@@ -45,6 +45,21 @@ def test_valid_state_json(capsys):
     assert payload["openmm_version"] == "8.6"
 
 
+def test_quiet_suppresses_output_on_success(capsys):
+    assert main([str(FIXTURES / "state_valid.xml"), "--quiet"]) == 0
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""
+
+
+def test_quiet_still_reports_missing_file_on_stderr(tmp_path, capsys):
+    missing = tmp_path / "does_not_exist.xml"
+    assert main([str(missing), "-q"]) == 1
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert "no such file" in err
+
+
 def test_not_xml_rejected(capsys):
     assert main([str(FIXTURES / "not_xml.txt")]) == 1
     assert "not well-formed XML" in capsys.readouterr().err
