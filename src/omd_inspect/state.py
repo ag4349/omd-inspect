@@ -42,6 +42,8 @@ def inspect_state(path: Path) -> StateSummary:
     valid = True
     particles = 0
     box_volume = None
+    step_count = None
+    time_ps = None
 
     try:
         if positions is not None:
@@ -52,6 +54,8 @@ def inspect_state(path: Path) -> StateSummary:
             valid = False
         if box is not None:
             box_volume = _box_volume(box)
+        step_count = _int_attr(root, "stepCount")
+        time_ps = _float_attr(root, "time")
     except (TypeError, ValueError):
         valid = False
 
@@ -66,8 +70,8 @@ def inspect_state(path: Path) -> StateSummary:
 
     return StateSummary(
         particles=particles,
-        step_count=_int_attr(root, "stepCount"),
-        time_ps=_float_attr(root, "time"),
+        step_count=step_count,
+        time_ps=time_ps,
         has_positions=positions is not None,
         has_velocities=velocities is not None,
         has_box=box is not None,
