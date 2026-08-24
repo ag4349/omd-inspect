@@ -4,6 +4,7 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
+from omd_inspect import __version__
 from omd_inspect.state import inspect_state
 from omd_inspect.xmltypes import sniff_root_tag
 
@@ -20,6 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("path", type=Path, help="OpenMM State .xml file (not a .chk checkpoint)")
     parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return parser
 
 
