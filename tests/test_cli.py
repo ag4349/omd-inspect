@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from omd_inspect import __version__
 from omd_inspect.cli import main
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -12,6 +13,13 @@ def test_help_exits_zero(capsys):
     with pytest.raises(SystemExit) as exc:
         main(["--help"])
     assert exc.value.code == 0
+
+
+def test_version_exits_zero(capsys):
+    with pytest.raises(SystemExit) as exc:
+        main(["--version"])
+    assert exc.value.code == 0
+    assert __version__ in capsys.readouterr().out
 
 
 def test_missing_file_exits_nonzero(tmp_path, capsys):
