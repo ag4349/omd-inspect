@@ -21,6 +21,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("path", type=Path, help="OpenMM State .xml file (not a .chk checkpoint)")
     parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    parser.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        help="suppress the summary output; only the exit code signals validity",
+    )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return parser
 
@@ -50,7 +56,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"omd-inspect: {exc}", file=sys.stderr)
         return 1
 
-    print(json.dumps(asdict(summary)) if args.json else summary)
+    if not args.quiet:
+        print(json.dumps(asdict(summary)) if args.json else summary)
     return 0 if summary.valid else 1
 
 
