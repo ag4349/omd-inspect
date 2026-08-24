@@ -75,3 +75,64 @@ def test_wrong_xml_type_rejected(capsys):
     err = capsys.readouterr().err
     assert "System" in err
     assert "not a State" in err
+
+
+def test_diff_comparable_states_exits_zero(capsys):
+    args = [str(FIXTURES / "state_valid.xml"), "--diff", str(FIXTURES / "state_valid_later.xml")]
+    assert main(args) == 0
+    out = capsys.readouterr().out
+    assert "comparable      True" in out
+    assert "5" in out
+    assert "250" in out
+
+
+def test_diff_json_shape(capsys):
+    args = [
+        str(FIXTURES / "state_valid.xml"),
+        "--diff",
+        str(FIXTURES / "state_valid_later.xml"),
+        "--json",
+    ]
+    assert main(args) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert set(payload.keys()) == {"a", "b", "comparable"}
+    assert payload["a"]["step_count"] == 5
+    assert payload["b"]["step_count"] == 250
+    assert payload["comparable"] is True
+
+
+def test_diff_particle_mismatch_exits_nonzero(capsys):
+    args = [str(FIXTURES / "state_valid.xml"), "--diff", str(FIXTURES / "state_valid_2particles.xml")]
+    assert main(args) == 1
+    out = capsys.readouterr().out
+    assert "comparable      False" in out
+
+
+def test_diff_one_side_missing_reports_that_file(tmp_path, capsys):
+    missing = tmp_path / "does_not_exist.xml"
+    args = [str(FIXTURES / "state_valid.xml"), "--diff", str(missing)]
+    assert main(args) == 1
+    err = capsys.readouterr().err
+    assert "no such file" in err
+    assert str(missing) in err
+
+
+def test_diff_one_side_wrong_type_reports_that_file(capsys):
+    args = [str(FIXTURES / "state_valid.xml"), "--diff", str(FIXTURES / "system.xml")]
+    assert main(args) == 1
+    err = capsys.readouterr().err
+    assert "System" in err
+    assert "not a State" in err
+
+
+def test_diff_quiet_suppresses_output(capsys):
+    args = [
+        str(FIXTURES / "state_valid.xml"),
+        "--diff",
+        str(FIXTURES / "state_valid_later.xml"),
+        "-q",
+    ]
+    assert main(args) == 0
+    out, err = capsys.readouterr()
+    assert out == ""
+    assert err == ""

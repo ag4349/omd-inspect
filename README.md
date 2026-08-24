@@ -32,12 +32,33 @@ A `.xml` file that isn't actually a `State` (OpenMM also serializes
 `System` and `Integrator` objects the same way) is rejected with a clear
 message naming what it actually is, rather than silently misparsed.
 
+For scripting, `-q`/`--quiet` suppresses the summary and leaves just the
+exit code:
+
+```bash
+omd-inspect state.xml -q && echo "still running"
+```
+
+## Compare two state files
+
+```bash
+omd-inspect a.xml --diff b.xml
+```
+
+Prints both files' fields side by side. Exit code is `0` only if both
+files are valid `State` XML *and* have the same particle count (i.e. are
+actually snapshots of the same system) — the exit code answers "is this
+diff even meaningful," not "are the two files identical," since two state
+files from the same run are expected to differ in step/time. `--json`
+emits `{"a": {...}, "b": {...}, "comparable": bool}`.
+
 ## Scope
 
 **In scope:** read-only inspection of a single OpenMM `State` XML file —
 particle count, step count, simulated time, whether positions/velocities/
 a periodic box are present, box volume, and whether the file is well-formed
-and (if `openmm` is installed) actually loadable via `XmlSerializer`.
+and (if `openmm` is installed) actually loadable via `XmlSerializer` —
+plus comparing two such files.
 
 **Out of scope:** trajectory files (`mdtraj`/`MDAnalysis`/`cpptraj` already
 cover this), other MD engines' file formats (`gmx check`/`cpptraj` own
